@@ -1,20 +1,6 @@
 import ActionTypes from '../actionTypes';
 
-export interface MeteoriteLanding {
-  fall: 'Fell' | 'Found';
-  geolocation: {
-    type: 'Point';
-    coordinates: [number, number];
-  };
-  id: string;
-  mass: number;
-  name: string;
-  nameType: 'Valid';
-  recclass: string;
-  reclat: string;
-  reclong: string;
-  year: Date;
-}
+import type {MeteoriteLanding} from '../../types';
 
 interface State {
   landings: Array<MeteoriteLanding>;
@@ -23,6 +9,8 @@ interface State {
   distinct: {
     [key in keyof MeteoriteLanding]?: Array<string>;
   };
+  // Array of ids
+  favorites: Array<string>;
 }
 
 type Action = {
@@ -34,6 +22,7 @@ const initialState: State = {
   landings: [],
   landingIdIndexes: {},
   distinct: {},
+  favorites: [],
 };
 
 const getDistinctValues = (
@@ -49,7 +38,7 @@ const getDistinctValues = (
 export default function reduceData(
   state: State = initialState,
   action: Action,
-) {
+): State {
   if (!action.type) {
     return state;
   }
@@ -57,6 +46,7 @@ export default function reduceData(
   switch (action.type) {
     case ActionTypes.data.setLandings:
       return {
+        ...state,
         landings: data as Array<MeteoriteLanding>,
         landingIdIndexes: data.reduce(
           (landings: {[id: string]: number} = {}, current, index) => {
@@ -65,7 +55,7 @@ export default function reduceData(
           },
           {},
         ),
-        values: Object.keys(data[0] as MeteoriteLanding)
+        distinct: Object.keys(data[0] as MeteoriteLanding)
           .filter(
             key =>
               ['fall', 'recclass', 'nametype', 'mass', 'year'].indexOf(key) !==
@@ -78,6 +68,16 @@ export default function reduceData(
             );
             return distinct;
           }, {}),
+      };
+    case ActionTypes.data.favoriteItem:
+      return {
+        ...state,
+        favorites: [...state.favorites, data.id],
+      };
+    case ActionTypes.data.unfavoriteItem:
+      return {
+        ...state,
+        favorites: state.favorites.filter(id => id !== data.id),
       };
     default:
       return state;

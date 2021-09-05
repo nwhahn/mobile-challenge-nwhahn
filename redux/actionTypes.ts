@@ -9,6 +9,8 @@ interface ActionTypes {
 const ActionTypes = {
   data: {
     setLandings: 'DATA_SET_LANDINGS',
+    favoriteItem: 'DATA_FAVORITE_ITEM',
+    unfavoriteItem: 'DATA_UNFAVORITE_ITEM',
   },
 };
 
