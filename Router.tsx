@@ -5,6 +5,7 @@ import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {useAppDispatch} from './redux/hooks';
 import type {AppDispatch} from './redux/store';
@@ -12,6 +13,7 @@ import ActionTypes from './redux/actionTypes';
 
 import {ListsScreen, MapsScreen, ChartsScreen} from './pages';
 import theme from './theme';
+import {Header} from './components/header';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,38 +28,54 @@ const initializeData = async (dispatch: AppDispatch) => {
   });
 };
 const Router = () => {
-  const {primary, border, text: textColor} = theme.colors;
+  const {primary, card: cardColor, text: textColor} = theme.colors;
 
   const dispatch = useAppDispatch();
   useEffect(() => {
     initializeData(dispatch);
   }, [dispatch]);
-  const bottomTabBarOptions: BottomTabNavigationOptions = {
-    headerShown: false,
-    tabBarStyle: {
-      backgroundColor: primary,
-    },
-    tabBarInactiveTintColor: textColor,
-    tabBarActiveTintColor: border,
-  };
   return (
     <NavigationContainer theme={theme}>
-      <Tab.Navigator initialRouteName="Home">
-        <Tab.Screen
-          name="List"
-          component={ListsScreen}
-          options={bottomTabBarOptions}
-        />
-        <Tab.Screen
-          name="Map"
-          component={MapsScreen}
-          options={bottomTabBarOptions}
-        />
-        <Tab.Screen
-          name="Charts"
-          component={ChartsScreen}
-          options={bottomTabBarOptions}
-        />
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={({route}): BottomTabNavigationOptions => ({
+          headerStyle: {
+            backgroundColor: primary,
+          },
+          headerTitleAlign: 'left',
+          headerTitle: props => <Header {...props} />,
+          tabBarStyle: {
+            backgroundColor: primary,
+          },
+          tabBarInactiveTintColor: cardColor,
+          tabBarActiveTintColor: textColor,
+          tabBarIcon: ({focused, color, size}) => {
+            let iconName;
+            switch (route.name) {
+              case 'Charts':
+                iconName = 'stats-chart-outline';
+                break;
+              case 'Map':
+                iconName = 'map-outline';
+                break;
+              case 'List':
+              default:
+                iconName = 'list-outline';
+                break;
+            }
+            return (
+              <Ionicons
+                name={iconName}
+                size={size}
+                color={color}
+                focused={focused}
+              />
+            );
+          },
+        })}>
+        <Tab.Screen name="List" component={ListsScreen} />
+        <Tab.Screen name="Map" component={MapsScreen} />
+        <Tab.Screen name="Charts" component={ChartsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
