@@ -19,10 +19,7 @@ const StyledFlatList = styled.FlatList`
   width: 100%;
 `;
 const List = () => {
-  const landings = useAppSelector(({data}: RootState) => data.landings).slice(
-    0,
-    10,
-  );
+  const landings = useAppSelector(({data}: RootState) => data.landings);
   const renderItem = ({item}) => <LandingListItem data={item} />;
   return (
     <Wrapper>
