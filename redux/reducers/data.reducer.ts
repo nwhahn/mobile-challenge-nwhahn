@@ -7,6 +7,10 @@ type MapBox = {
   maxX: number;
   maxY: number;
 };
+type SearchData = {
+  query: string;
+  enabled: boolean;
+};
 interface State {
   landings: Array<MeteoriteLanding>;
   // Pointer to location in landings array :)
@@ -17,12 +21,14 @@ interface State {
   // Array of ids
   favorites: Array<string>;
   mapBox: MapBox;
+  search: SearchData;
+  filteredItems: Array<MeteoriteLanding>;
 }
 
-type Action = {
+interface Action {
   type: string;
   payload?: any;
-};
+}
 
 const initialState: State = {
   landings: [],
@@ -35,6 +41,8 @@ const initialState: State = {
     maxX: 100,
     maxY: 100,
   },
+  search: {query: '', enabled: false},
+  filteredItems: [],
 };
 const generateViewBox = (data: Array<MeteoriteLanding>): MapBox => {
   let maxX = -Infinity;
@@ -55,6 +63,20 @@ const generateViewBox = (data: Array<MeteoriteLanding>): MapBox => {
     }
   });
   return {minX, minY, maxX, maxY};
+};
+
+const doFilter = (
+  data: Array<MeteoriteLanding>,
+  {query}: SearchData,
+): Array<MeteoriteLanding> => {
+  return data.filter(({name}) => {
+    if (
+      !new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig').test(name)
+    ) {
+      return false;
+    }
+    return true;
+  });
 };
 const getDistinctValues = (
   key: keyof MeteoriteLanding,
@@ -110,6 +132,21 @@ export default function reduceData(
       return {
         ...state,
         favorites: state.favorites.filter(id => id !== data.id),
+      };
+    case ActionTypes.data.search:
+      const newSearchQuery: SearchData = {
+        ...state.search,
+        query: data.query,
+        enabled: data?.query?.length > 0,
+      };
+      const filteredItems: Array<MeteoriteLanding> = doFilter(
+        state.landings,
+        newSearchQuery,
+      );
+      return {
+        ...state,
+        search: newSearchQuery,
+        filteredItems: filteredItems,
       };
     default:
       return state;
