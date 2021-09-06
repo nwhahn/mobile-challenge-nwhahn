@@ -53,14 +53,14 @@ const Router = () => {
             let iconName;
             switch (route.name) {
               case 'Charts':
-                iconName = 'stats-chart-outline';
+                iconName = 'stats-chart';
                 break;
               case 'Map':
-                iconName = 'map-outline';
+                iconName = 'map';
                 break;
               case 'List':
               default:
-                iconName = 'list-outline';
+                iconName = 'list';
                 break;
             }
             return (

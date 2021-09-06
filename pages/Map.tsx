@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import styled from 'styled-components/native';
 import Svg, {G, Text, Circle} from 'react-native-svg';
 import {useTheme} from '@react-navigation/native';
@@ -48,7 +48,8 @@ const VerticalButtonsWrapper = styled.View`
 const LandingDataWrapper = styled.View`
   top: 16px;
   position: absolute;
-  padding: 4px;
+  padding-left: 16px;
+  padding-right: 16px;
   width: 100%;
   z-index: 1;
 `;
@@ -56,27 +57,21 @@ const Map = () => {
   const {colors} = useTheme();
   const zoomableViewRef = useRef<ZoomableView>();
   const data = useAppSelector(
-    ({data: {mapBox, landings, landingIdIndexes}}) => ({
+    ({data: {mapBox, landings, landingIdIndexes, filteredItems, search}}) => ({
       mapBox,
       landings,
+      filteredItems: search.enabled ? filteredItems : landings,
       landingIdIndexes,
     }),
   );
-  const {minX, minY, maxX, maxY} = data.mapBox;
-  const [selectedLanding, setSelectedLanding] = useState<string | null>(null);
-  const [landingData, setLandingData] = useState<MeteoriteLanding | null>(null);
 
-  useEffect(() => {
-    if (selectedLanding) {
-      const {landings, landingIdIndexes} = data;
-      if (
-        landingIdIndexes[selectedLanding] &&
-        landings[landingIdIndexes[selectedLanding]]
-      ) {
-        setLandingData(landings[landingIdIndexes[selectedLanding]]);
-      }
-    }
-  }, [selectedLanding, data]);
+  const {minX, minY, maxX, maxY} = data.mapBox;
+  const [landingData, setLandingData] = useState<MeteoriteLanding | null>(null);
+  const getLandingById = (id: string) => {
+    const {landings, landingIdIndexes} = data;
+    return landings[landingIdIndexes[id]];
+  };
+
   return (
     <Wrapper>
       {landingData && (
@@ -97,13 +92,13 @@ const Map = () => {
           <IconButton
             name={'arrow-up-outline'}
             onPress={() => {
-              zoomableViewRef.current!.moveBy(30, 0);
+              zoomableViewRef.current!.moveBy(0, -30);
             }}
           />
           <IconButton
             name={'arrow-down-outline'}
             onPress={() => {
-              zoomableViewRef.current!.moveBy(0, -30);
+              zoomableViewRef.current!.moveBy(0, 30);
             }}
           />
         </VerticalButtonsWrapper>
@@ -111,7 +106,7 @@ const Map = () => {
           <IconButton
             name={'arrow-forward-outline'}
             onPress={() => {
-              zoomableViewRef.current!.moveBy(0, 30);
+              zoomableViewRef.current!.moveBy(30, 0);
             }}
           />
         </RightButtonWrapper>
@@ -143,7 +138,7 @@ const Map = () => {
           width={maxX - minX * 10}
           height={maxY - minY * 10}
           viewBox={`0 0 ${(maxX - minX) * 5} ${(maxY - minY) * 5}`}>
-          {data.landings.map(({id, geolocation, name}) => {
+          {data.filteredItems.map(({id, geolocation, name}) => {
             if (!geolocation) {
               return null;
             }
@@ -159,12 +154,12 @@ const Map = () => {
                   cx={(x - minX) * 5}
                   cy={(y - minY) * 5}
                   r={3}
-                  fill={selectedLanding === id ? colors.text : colors.primary}
+                  fill={landingData?.id === id ? colors.text : colors.primary}
                   strokeWidth={
                     10 * zoomableViewRef?.current?.state?.zoomLevel || 1
                   }
                   onPress={() => {
-                    setSelectedLanding(id);
+                    setLandingData(getLandingById(id));
                   }}
                 />
                 <Text

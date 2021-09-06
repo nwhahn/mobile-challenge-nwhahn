@@ -19,7 +19,15 @@ const StyledFlatList = styled.FlatList`
   width: 100%;
 `;
 const List = () => {
-  const landings = useAppSelector(({data}: RootState) => data.landings);
+  const landings = useAppSelector(
+    ({
+      data: {
+        landings,
+        search: {query = ''},
+        filteredItems,
+      },
+    }: RootState) => (query?.length > 0 ? filteredItems : landings),
+  );
   const renderItem = ({item}) => <LandingListItem data={item} />;
   return (
     <Wrapper>
