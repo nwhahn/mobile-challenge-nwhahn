@@ -1,7 +1,12 @@
 import ActionTypes from '../actionTypes';
 
 import type {MeteoriteLanding} from '../../types';
-
+type MapBox = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+};
 interface State {
   landings: Array<MeteoriteLanding>;
   // Pointer to location in landings array :)
@@ -11,6 +16,7 @@ interface State {
   };
   // Array of ids
   favorites: Array<string>;
+  mapBox: MapBox;
 }
 
 type Action = {
@@ -23,8 +29,33 @@ const initialState: State = {
   landingIdIndexes: {},
   distinct: {},
   favorites: [],
+  mapBox: {
+    minX: 0,
+    minY: 0,
+    maxX: 100,
+    maxY: 100,
+  },
 };
-
+const generateViewBox = (data: Array<MeteoriteLanding>): MapBox => {
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let minX = Infinity;
+  let minY = Infinity;
+  data.forEach(({geolocation: {coordinates: [x, y] = [0, 0]} = {}}) => {
+    // Manipulate
+    if (x > maxX) {
+      maxX = x;
+    } else if (x < minX) {
+      minX = x;
+    }
+    if (y > maxY) {
+      maxY = y;
+    } else if (y < minY) {
+      minY = y;
+    }
+  });
+  return {minX, minY, maxX, maxY};
+};
 const getDistinctValues = (
   key: keyof MeteoriteLanding,
   data: MeteoriteLanding[],
@@ -55,6 +86,7 @@ export default function reduceData(
           },
           {},
         ),
+        mapBox: generateViewBox(data as Array<MeteoriteLanding>),
         distinct: Object.keys(data[0] as MeteoriteLanding)
           .filter(
             key =>

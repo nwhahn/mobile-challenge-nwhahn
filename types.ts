@@ -5,7 +5,7 @@ export interface MeteoriteLanding {
     coordinates: [number, number];
   };
   id: string;
-  mass: number;
+  mass: string;
   name: string;
   nameType: 'Valid';
   recclass: string;
