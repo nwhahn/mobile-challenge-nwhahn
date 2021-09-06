@@ -1,10 +1,21 @@
 import {createStore} from 'redux';
-
+import {persistStore, persistReducer} from 'redux-persist';
 import rootReducer from './reducers';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const store = createStore(rootReducer);
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+};
 
-export {store};
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = createStore(persistedReducer);
+const persistor = persistStore(store);
+
+// persistor.purge()
+
+export {store, persistor};
 
 export type RootState = ReturnType<typeof store.getState>;
 
