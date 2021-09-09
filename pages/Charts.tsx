@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import styled from 'styled-components/native';
 import {BarChart, LineChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
@@ -25,11 +26,11 @@ const ChartsScreen = () => {
   const landings = useAppSelector(
     ({
       data: {
-        landings,
+        landings: fullLandings,
         search: {query = ''},
         filteredItems,
       },
-    }: RootState) => (query?.length > 0 ? filteredItems : landings),
+    }: RootState) => (query?.length > 0 ? filteredItems : fullLandings),
   );
   const renderYearChart = () => {
     const data = landings
