@@ -8,7 +8,7 @@ interface IconButtonProps {
   size?: number;
   color?: ColorValue;
   backgroundColor?: ColorValue;
-  onPress: () => void;
+  onPress: (...args: [any]) => void;
 }
 
 const ClickArea = styled.TouchableOpacity`
