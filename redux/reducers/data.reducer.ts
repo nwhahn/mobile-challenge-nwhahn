@@ -175,7 +175,6 @@ export default function reduceData(
         filterQuery,
         state.favorites,
       );
-      console.log(filterQuery);
       return {
         ...state,
         search: filterQuery,

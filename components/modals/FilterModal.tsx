@@ -144,6 +144,7 @@ const FilterModal = ({open, closeModal = () => {}}) => {
             <CheckBox
               boxType={'square'}
               disabled={false}
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{height: 16}}
               value={favoritesOnly}
               onValueChange={val => toggleFavorites(val)}
