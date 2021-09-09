@@ -9,6 +9,7 @@ import ActionTypes from '../../redux/actionTypes';
 const InputWrapper = styled.View`
   flex: 1;
   flex-direction: row;
+  justify-content: space-between;
   margin-right: 8px;
   border-radius: 8px;
   background-color: ${theme.colors.card};
@@ -19,7 +20,9 @@ const SearchBarInput = styled.TextInput`
   padding-top: ${Platform.OS === 'ios' ? 8 : 4}px;
   padding-bottom: ${Platform.OS === 'ios' ? 8 : 4}px;
 `;
-
+const LeftWrapper = styled.View`
+  flex-direction: row;
+`;
 function debounce<T extends Function>(cb: T, timeout = 300) {
   let t;
   return (...args) => {
@@ -27,6 +30,7 @@ function debounce<T extends Function>(cb: T, timeout = 300) {
     t = setTimeout(() => cb(...args), timeout);
   };
 }
+
 const SearchBar = () => {
   const {colors} = useTheme();
   const dispatch = useAppDispatch();
@@ -49,18 +53,27 @@ const SearchBar = () => {
 
   return (
     <InputWrapper>
+      <LeftWrapper>
+        <IconButton
+          name={'search-outline'}
+          backgroundColor={'transparent'}
+          color={text}
+          size={20}
+          onPress={() => commitChange(textValue)}
+        />
+        <SearchBarInput
+          placeholder={'search'}
+          placeholderTextColor={`${text}20`}
+          onChangeText={onChange}
+          value={textValue}
+        />
+      </LeftWrapper>
       <IconButton
-        name={'search-outline'}
+        name={'close'}
         backgroundColor={'transparent'}
         color={text}
         size={20}
-        onPress={() => {}}
-      />
-      <SearchBarInput
-        placeholder={'search'}
-        placeholderTextColor={`${text}20`}
-        onChangeText={onChange}
-        value={textValue}
+        onPress={() => onChange('')}
       />
     </InputWrapper>
   );

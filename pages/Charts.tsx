@@ -24,13 +24,8 @@ const ChartsScreen = () => {
   const {colors} = useTheme();
   const {text, primary} = colors;
   const landings = useAppSelector(
-    ({
-      data: {
-        landings: fullLandings,
-        search: {query = ''},
-        filteredItems,
-      },
-    }: RootState) => (query?.length > 0 ? filteredItems : fullLandings),
+    ({data: {landings: fullLandings, search, filteredItems}}: RootState) =>
+      search.enabled ? filteredItems : fullLandings,
   );
   const renderYearChart = () => {
     const data = landings
@@ -129,7 +124,7 @@ const ChartsScreen = () => {
         <YAxis
           data={grouped}
           style={{height: 176, position: 'absolute', bottom: 40, left: 4}}
-          contentInset={{top: 4}}
+          contentInset={{top: 4, bottom: 4}}
           svg={{
             fill: `${text}50`,
             fontSize: 10,
@@ -141,7 +136,7 @@ const ChartsScreen = () => {
           style={{height: 200, flex: 1, paddingLeft: 12}}
           data={grouped}
           svg={{stroke: primary, fill: primary}}
-          contentInset={{top: 20, bottom: 20, left: 8}}>
+          contentInset={{top: 20, bottom: 20}}>
           <Grid svg={{stroke: `${text}50`}} belowChart />
         </BarChart>
         <XAxis
@@ -152,7 +147,7 @@ const ChartsScreen = () => {
               return `${(val / 1000000).toFixed(0)}Mg`;
             }
             if (val / 1000 > 1) {
-              return `${val / 1000}kg`;
+              return `${(val / 1000).toFixed(0)}kg`;
             }
             return `${val}g`;
           }}

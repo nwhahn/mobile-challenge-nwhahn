@@ -12,6 +12,7 @@ const ActionTypes: ActionTypeSections = {
     favoriteItem: 'DATA_FAVORITE_ITEM',
     unfavoriteItem: 'DATA_UNFAVORITE_ITEM',
     search: 'SEARCH',
+    filter: 'FILTER',
   },
 };
 

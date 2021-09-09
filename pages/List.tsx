@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {useAppSelector} from '../redux/hooks';
 import {RootState} from '../redux/store';
 import {LandingListItem} from '../components/cards';
+import theme from '../theme';
 const Wrapper = styled.View`
   flex: 1;
   align-items: center;
@@ -18,15 +19,29 @@ const Separator = styled.View`
 const StyledFlatList = styled.FlatList`
   width: 100%;
 `;
+const EmptyCardWrapper = styled.View`
+  background-color: ${theme.colors.card};
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+`;
+
+const EmptyText = styled.Text`
+  color: ${theme.colors.text}50;
+  font-size: 16;
+`;
+const EmptyComponent = () => {
+  return (
+    <EmptyCardWrapper>
+      <EmptyText>{'No content - try removing filters.'}</EmptyText>
+    </EmptyCardWrapper>
+  );
+};
 const List = () => {
   const landings = useAppSelector(
-    ({
-      data: {
-        landings,
-        search: {query = ''},
-        filteredItems,
-      },
-    }: RootState) => (query?.length > 0 ? filteredItems : landings),
+    ({data: {landings: items, search, filteredItems}}: RootState) =>
+      search.enabled ? filteredItems : items,
   );
   const renderItem = ({item}) => <LandingListItem data={item} />;
   return (
@@ -36,6 +51,7 @@ const List = () => {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         ItemSeparatorComponent={Separator}
+        ListEmptyComponent={EmptyComponent}
       />
     </Wrapper>
   );
