@@ -14,6 +14,7 @@ type SearchData = {
   maxMass?: number;
   minYear?: number;
   maxYear?: number;
+  favoritesOnly?: boolean;
 };
 interface State {
   landings: Array<MeteoriteLanding>;
@@ -71,10 +72,11 @@ const generateViewBox = (data: Array<MeteoriteLanding>): MapBox => {
 
 const doFilter = (
   data: Array<MeteoriteLanding>,
-  {query, minMass, maxMass, minYear, maxYear}: SearchData,
+  {query, minMass, maxMass, minYear, maxYear, favoritesOnly}: SearchData,
+  favorites: Array<string>,
 ): Array<MeteoriteLanding> =>
   data.filter(
-    ({name, year = 0, mass = 0}) =>
+    ({id, name, year = 0, mass = 0}) =>
       !(
         !new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig').test(
           name,
@@ -82,7 +84,8 @@ const doFilter = (
         (minYear && new Date(year).getTime() < minYear) ||
         (maxYear && new Date(year).getTime() > maxYear) ||
         (minMass && mass < minMass) ||
-        (maxMass && mass > maxMass)
+        (maxMass && mass > maxMass) ||
+        (favoritesOnly && favorites.indexOf(id) === -1)
       ),
   );
 
@@ -150,6 +153,7 @@ export default function reduceData(
       const filteredItems: Array<MeteoriteLanding> = doFilter(
         state.landings,
         newSearchQuery,
+        state.favorites,
       );
       return {
         ...state,
@@ -162,11 +166,14 @@ export default function reduceData(
         ...data,
         enabled:
           state.search?.query?.length ||
-          Object.values(data).findIndex(val => val !== null) !== -1,
+          Object.values(data).findIndex(
+            val => val !== null && val !== false,
+          ) !== -1,
       };
       const filtered: Array<MeteoriteLanding> = doFilter(
         state.landings,
         filterQuery,
+        state.favorites,
       );
       console.log(filterQuery);
       return {

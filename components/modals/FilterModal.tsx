@@ -6,6 +6,7 @@ import {RangeSlider} from '../sliders';
 import {Button, IconButton} from '../buttons';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import ActionTypes from '../../redux/actionTypes';
+import CheckBox from '@react-native-community/checkbox';
 interface ModalProps {
   open: boolean;
 }
@@ -43,6 +44,16 @@ const Line = styled.View`
   width: 100%;
   margin-bottom: 4px;
 `;
+
+const CheckBoxWrapper = styled.View`
+  padding-top: 16px;
+  flex-direction: row;
+`;
+const CheckBoxLabel = styled.Text`
+  color: ${theme.colors.text};
+  align-self: center;
+  font-size: 14px;
+`;
 const FilterList = styled.ScrollView``;
 
 const ButtonWrapper = styled.View`
@@ -70,7 +81,9 @@ const FilterModal = ({open, closeModal = () => {}}) => {
   const [maxYear, setMaxYear] = useState(data.search.maxYear || data.maxYear);
   const [minMass, setMinMass] = useState(data.search.minMass || data.minMass);
   const [maxMass, setMaxMass] = useState(data.search.maxMass || data.maxMass);
-
+  const [favoritesOnly, toggleFavorites] = useState(
+    !!data.search.favoritesOnly,
+  );
   const apply = () => {
     dispatch({
       type: ActionTypes.data.filter,
@@ -80,6 +93,7 @@ const FilterModal = ({open, closeModal = () => {}}) => {
         maxYear: data.maxYear === maxYear ? null : maxYear,
         minMass: data.minMass === minMass ? null : minMass,
         maxMass: data.maxMass === maxMass ? null : maxMass,
+        favoritesOnly,
       },
     });
     closeModal();
@@ -126,6 +140,24 @@ const FilterModal = ({open, closeModal = () => {}}) => {
               return `${val}g`;
             }}
           />
+          <CheckBoxWrapper>
+            <CheckBox
+              boxType={'square'}
+              disabled={false}
+              style={{height: 16}}
+              value={favoritesOnly}
+              onValueChange={val => toggleFavorites(val)}
+              tintColor={`${theme.colors.text}30`}
+              onCheckColor={theme.colors.primary}
+              onTintColor={theme.colors.primary}
+              onAnimationType={'fill'}
+              tintColors={{
+                true: theme.colors.primary,
+                false: theme.colors.card,
+              }}
+            />
+            <CheckBoxLabel>{'Filter by My Favorites'}</CheckBoxLabel>
+          </CheckBoxWrapper>
         </FilterList>
         <ButtonWrapper>
           <Button onPress={apply} label={'Apply'} />

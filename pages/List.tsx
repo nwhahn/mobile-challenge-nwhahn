@@ -29,7 +29,7 @@ const EmptyCardWrapper = styled.View`
 
 const EmptyText = styled.Text`
   color: ${theme.colors.text}50;
-  font-size: 16;
+  font-size: 16px;
 `;
 const EmptyComponent = () => {
   return (
